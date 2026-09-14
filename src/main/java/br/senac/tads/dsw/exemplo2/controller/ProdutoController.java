@@ -3,6 +3,7 @@ package br.senac.tads.dsw.exemplo2.controller;
 import java.net.URI;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,7 +50,7 @@ public class ProdutoController {
     } 
 
 
-    @GetMapping("{/id}") 
+    @GetMapping("/{id}") 
     public ResponseEntity<Produto> buscarPorId (@PathVariable Long id) {
         Optional<Produto> produtoBuscado = repository.findById(id);
 
@@ -59,18 +60,30 @@ public class ProdutoController {
             return ResponseEntity.notFound().build();
     }
 
-        @PutMapping("{/id}") 
+        @PutMapping("/{id}") 
         public ResponseEntity<Produto> atualizarProduto (@PathVariable Long id, @RequestBody Produto produtoAtualizado) {
         Optional<Produto> produtoBuscado = repository.findById(id);
 
         if (produtoBuscado.isPresent()){
             Produto produtoExistente = produtoBuscado.get();
             produtoExistente.setNome(produtoAtualizado.getNome());
-            produtoExistente.setPreco(ProdutoAtualizado.getPreco());
+            produtoExistente.setPreco(produtoAtualizado.getPreco());
 
             repository.save(produtoExistente);
 
-            return ResponseEntity.ok(produtoBuscado.get());
+            return ResponseEntity.ok(produtoExistente);
+        } else
+            return ResponseEntity.notFound().build();
+    }
+
+        @DeleteMapping("/{id}") 
+        public ResponseEntity<Void> apagarProduto (@PathVariable Long id) {
+        Optional<Produto> produtoBuscado = repository.findById(id);
+
+        if (produtoBuscado.isPresent()){
+            repository.deleteById(id);
+            
+            return ResponseEntity.noContent().build();
         } else
             return ResponseEntity.notFound().build();
     }
